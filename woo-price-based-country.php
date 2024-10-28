@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Country Switch for Woo Pricing & Promos
+Plugin Name: Woocommerce price based on country
 Description: Control country-based pricing, shipping & promos
 Version: 1.0
 Author: Rajneesh Saini
