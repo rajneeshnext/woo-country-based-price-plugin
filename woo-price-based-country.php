@@ -80,7 +80,7 @@ class Woo_Country_Switch_Pricing {
         echo '<div class="options_group">';
         $countries_json = get_option('woo_country_pricing_exchange_rates', []);
         $countries = json_decode($countries_json, true);
-        foreach ($countries as $country) {
+        foreach ($countries as $country => $value) {
             woocommerce_wp_text_input([
                 'id' => '_price_' . $country,
                 'label' => __('Price for ' . $country, 'woocommerce') . ' (' . get_woocommerce_currency_symbol() . ')',
@@ -95,7 +95,7 @@ class Woo_Country_Switch_Pricing {
     public function save_country_price_fields($post_id) {
         $countries_json = get_option('woo_country_pricing_exchange_rates', []);
         $countries = json_decode($countries_json, true);
-        foreach ($countries as $country) {
+        foreach ($countries as $country => $value) {
             $price = isset($_POST['_price_' . $country]) ? sanitize_text_field($_POST['_price_' . $country]) : '';
             if (!empty($price)) {
                 update_post_meta($post_id, '_price_' . $country, $price);
@@ -107,14 +107,17 @@ class Woo_Country_Switch_Pricing {
     public function adjust_price_based_on_country($price, $product) {
         $country = $this->get_user_country();
         if (!$country) return $price;
-
+		
         $country_price = get_post_meta($product->get_id(), '_price_' . $country, true);
         if ($country_price) {
             $exchange_rates = get_option('woo_country_pricing_exchange_rates', []);
             $exchange_rate = isset($exchange_rates[$country]) ? floatval($exchange_rates[$country]) : 1;
             $price = wc_price($country_price * $exchange_rate);
-        }
-        return $price;
+			return $price;
+        }else{
+			$shop_country = wc_get_base_location()['country'];	
+			return $price;
+		}
     }
 
     // Shortcode to display country flags
